@@ -1,34 +1,42 @@
-// import express
-const express = require('express')
-const routes = require('./routes') // importing index.js from routes folder
-const { config } = require('dotenv')
-const { default: mongoose } = require('mongoose')
-const cors = require('cors')
+const express = require('express');
+const { config } = require('dotenv');
+const { default: mongoose } = require('mongoose');
+const cors = require('cors');
 
-config()
+config();
 
-const port = process.env.PORT_ADDR
-const mongoAddr = process.env.MONGO_ADDR
+const port = process.env.PORT_ADDR || 8000;
+const mongoAddr = process.env.MONGO_ADDR;
 
-const app = express()
+const app = express();
 
-app.use(cors())
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(express.json())
-app.use(express.urlencoded())
+// ✅ Default route to check server
+app.get('/', (req, res) => {
+    res.send('Server is running 🚀');
+});
 
-app.use(routes)
 
+
+// Error handling middleware
 app.use((error, req, res, next) => {
     res.status(error.status || 500).json({
         error: error.message || 'Request execution error.'
-    })
-})
+    });
+});
 
+// Start server and connect to MongoDB
 app.listen(port, async () => {
-    console.log(`Server started at http://localhost:${port}`)
-    console.log('Press Ctrl+C to stop')
+    console.log(`Server started at http://localhost:${port}`);
+    console.log('Press Ctrl+C to stop');
 
-    // await mongoose.connect(mongoAddr)
-    // console.log("MongoDB Connected")
-})
+    try {
+        await mongoose.connect(mongoAddr);
+        console.log('MongoDB Connected');
+    } catch (err) {
+        console.error('MongoDB connection failed:', err.message);
+    }
+});

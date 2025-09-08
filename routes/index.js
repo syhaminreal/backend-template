@@ -9,6 +9,13 @@ const router = express.Router()
 // Mount auth routes under /auth
 router.use('/auth', authRoutes)
 
+
+router.use((req,res,next) =>{
+    res.status(404).json({
+        error:'Not found'
+    })
+})
+
 // //mount staff routas
 // router.use("/staffs", adminUser, staffsRoutes);
 
